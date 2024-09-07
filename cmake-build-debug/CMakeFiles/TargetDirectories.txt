@@ -1,0 +1,3 @@
+/home/anastasiia/Documents/Object Oriented Programming and Design (SEBA27)/ask.1_oop&d/cmake-build-debug/CMakeFiles/ask_1_oop_d.dir
+/home/anastasiia/Documents/Object Oriented Programming and Design (SEBA27)/ask.1_oop&d/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/anastasiia/Documents/Object Oriented Programming and Design (SEBA27)/ask.1_oop&d/cmake-build-debug/CMakeFiles/rebuild_cache.dir
