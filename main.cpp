@@ -2,27 +2,38 @@
 #include <string>
 #include <fstream>
 #include <vector>
-#include <algorithm>
 using namespace std;
+
+struct Seat {
+    int seat_number;
+    string status;
+    string user_name;
+
+    Seat(int number) : seat_number(number), status("available"), user_name("") {}
+};
 
 class Ticket {
 private:
     string date_ticket;
     string flight_ticket;
     string price_ticket;
-    string status;
-    vector<int> seats;
+    vector<Seat> seats;
     int id_id;
     string user_name;
 
 public:
     Ticket(string date, string flight, string price, const vector<int>& list_of_seats)
-        : date_ticket(date), flight_ticket(flight), price_ticket(price), seats(list_of_seats), status("available"), id_id(0), user_name("") {}
+     : date_ticket(date), flight_ticket(flight), price_ticket(price), id_id(0), user_name("") {
+        for (int seat_number : list_of_seats) {
+            seats.emplace_back(seat_number);
+        }
+    }
+
 
     string getDate() const { return date_ticket; }
     string getFlight() const { return flight_ticket; }
 
-    string getPrice() const { return price_ticket; }
+ //   string getPrice() const { return price_ticket; }
 
     string getUserName() const { return user_name; }
     void setUserName(const string& name) { user_name = name; }
@@ -30,20 +41,11 @@ public:
     int getId() const { return id_id; }
     void setId(int ticket_id) { id_id = ticket_id; }
 
-    vector<int>& getSeats() { return seats; }
-    const vector<int>& getSeats() const { return seats; }
+    vector<Seat>& getSeats() { return seats; }
+    const vector<Seat>& getSeats() const { return seats; }
 
-    string getStatus() const { return status; }
-    void setStatus(const string& new_status) { status = new_status; }
 
-    bool isAvailable() const { return status == "available"; }
-
-    bool isBooked() const { return status == "booked"; }
 };
-
-
-
-
 
 class FileReader {
 public:
@@ -79,11 +81,18 @@ public:
             index++;
 
 
-
             while (index < line.size() && line[index] != ' ') {
                 seats_range += line[index];
                 index++;
             }
+            index++;
+
+
+            while (index < line.size()) {
+                price += line[index];
+                index++;
+            }
+
 
             vector<int> seats;
             int dash = seats_range.find('-');
@@ -111,91 +120,83 @@ public:
 
 
 void status_ticket(const vector<Ticket>& tickets, const string& date, const string& flight) {
-
-
     for (const auto& ticket : tickets) {
-        if (ticket.getDate() == date && ticket.getFlight() == flight && ticket.isAvailable() ) {
+        if (ticket.getDate() == date && ticket.getFlight() == flight) {
 
-            const vector<int>& valid_s = ticket.getSeats();
-
-            if (!valid_s.empty()) {
-                    cout << "List of valid seats : ";
-                    for (int seat : valid_s) {
-                        cout << seat << " , ";
-                    }
-                    cout << endl;
+            const vector<Seat>& seats = ticket.getSeats();
+             for (const Seat& seat : seats) {
+                if (seat.status == "available") {
+                    cout << seat.seat_number << " ";
                 }
+
+            }
 
         }
     }
 }
+
+void return_tickets(vector<Ticket>& tickets, int ticket_id, const string& user_name) {
+    for (auto& ticket : tickets) {
+        if (ticket.getId() == ticket_id) {
+            vector<Seat>& seats = ticket.getSeats();
+            for (auto& seat : seats) {
+                if (seat.user_name == user_name && seat.status == "booked") {
+                    seat.status = "available";
+                    seat.user_name = "";
+                    cout <<  " successfully)))\n";
+                    return;
+                }
+            }
+            cout << "No.\n";
+            return;
+        }
+    }
+    cout <<  " not found.\n";
+}
+
+
+
+
 void booking(vector<Ticket>& tickets, const string& date, const string& flight, int seat_number, const string& user_name, int& book_id) {
     for (auto& ticket : tickets) {
-        if (ticket.getDate() == date && ticket.getFlight() == flight && ticket.isAvailable()) {
+        if (ticket.getDate() == date && ticket.getFlight() == flight) {
+            vector<Seat>& seats = ticket.getSeats();
 
+            for (Seat& seat : seats) {
+                if (seat.seat_number == seat_number) {
+                    if (seat.status == "available") {
+                        seat.status = "booked";
+                        seat.user_name = user_name;
+                        ticket.setId(book_id);
+                        ticket.setUserName(user_name);
 
-            vector<int>& seats = ticket.getSeats();
+                        book_id++;
 
-            auto it = find(seats.begin(), seats.end(), seat_number);
-
-            if (it != seats.end()) {
-
-                seats.erase(it);
-
-                ticket.setId(book_id);
-                book_id++;
-
-
-                ticket.setUserName(user_name);
-
-                cout << "Seat " << seat_number << " : Booker " << user_name
-                     << "; ID: " << ticket.getId()
-                     << "; Price: " << ticket.getPrice() << ".\n";
-
-
-                    ticket.setStatus("booked");
-
-
-                return;
-            } else {
-                cout << "Seat " << seat_number << " is not available.\n";
-                return;
+                        cout << "Seat " << seat.seat_number << " is booked by " << seat.user_name
+                             << "; ID: " << ticket.getId() << endl;
+                    } else {
+                        cout << "Seat " << seat_number << " is not available.\n";
+                    }
+                    return;
+                }
             }
+            return;
         }
     }
 }
 
 
 void view_ticket_by_id(const vector<Ticket>& tickets, int ticket_id) {
-    bool found = false;
-
     for (const auto& ticket : tickets) {
-
         if (ticket.getId() == ticket_id) {
             cout << "ID: " << ticket.getId() << endl;
-            cout << "Price: " << ticket.getPrice() << endl;
+        //    cout << "Price: " << ticket.getPrice() << endl;
             cout << "Booked : " << ticket.getUserName() << endl;
-
-
-            found = true;
-            break;
+            return;
         }
 
-        else {
-        cout << " NOT FOR " << ticket_id <<  endl;
     }
-
-    }
-
-
 }
-
-
-
-
-
-
-
 int main() {
     int choice;
     int book_id = 1;
@@ -207,8 +208,10 @@ int main() {
         cout << "--- choice ---\n";
         cout << "1. check\n";
         cout << "2. book\n";
-        cout << "3. return\n";
-        cout << "4. view\n";
+
+        cout << "3. view by ID\n";
+        cout << "4. return\n";
+
         cout << "0. exit\n";
         cout << "--- Choice ---\n";
         cin >> choice;
@@ -237,20 +240,30 @@ int main() {
                 cout << "enter user name\n";
                 cin >> user_name;
 
-                book_id++;
                 booking(tickets, date, flight, seat, user_name, book_id);
                 break;
             }
-            case 3:
-
-                    break;
-
-            case 4:
+            case 3: {
                 int ticket_id;
-            cout << "Enter ticket ID: ";
-            cin >> ticket_id;
-            view_ticket_by_id(tickets, ticket_id);
-            break;
+                cout << "Enter ticket ID: ";
+                cin >> ticket_id;
+                view_ticket_by_id(tickets, ticket_id);
+                break;
+            }
+            case 4: {
+                int ticket_id;
+                string user_name;
+                cout << "Enter ticket ID: ";
+                cin >> ticket_id;
+                cout << "Enter your user name: ";
+                cin >> user_name;
+
+                return_tickets(tickets, ticket_id, user_name);
+                break;
+            }
+
+
+
 
             default:
                 cout << "Invalid Choice\n";

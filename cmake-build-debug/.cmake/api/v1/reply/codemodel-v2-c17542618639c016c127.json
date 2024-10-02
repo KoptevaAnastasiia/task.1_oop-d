@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/home/anastasiia/Documents/Object Oriented Programming and Design (SEBA27)/ask.1_oop&d/cmake-build-debug",
-		"source" : "/home/anastasiia/Documents/Object Oriented Programming and Design (SEBA27)/ask.1_oop&d"
+		"build" : "/home/anastasiia/CLionProjects/task.1_oop-d000/cmake-build-debug",
+		"source" : "/home/anastasiia/CLionProjects/task.1_oop-d000"
 	},
 	"version" : 
 	{
